@@ -1,5 +1,5 @@
 // Copyright 2022 Dmitriy <dimapermyakov55@gmail.com>
-
+#pragma once
 #ifndef DIMA_VECTOR_HEADER_HPP
 #define DIMA_VECTOR_HEADER_HPP
 #include <exception>
@@ -20,10 +20,10 @@ public:
     public:
         Iterator() : pointer_(nullptr) {}
         explicit Iterator(ValueType* ptr) : pointer_(ptr) {}
-        Iterator<ValueType>& operator+(const int& n) {
+        /*Iterator<ValueType>& operator+(const int& n) {
             pointer_ += n;
             return *this;
-        }
+        }*/
         Iterator<ValueType>& operator-(const int& n) {
             pointer_ -= n;
             return *this;
@@ -200,8 +200,27 @@ void vector<T>::clear() noexcept {
 template <class T>
 inline void vector<T>::swap(vector<T>& vec) noexcept {
     if (&vec != this) {
-        for (size_t i = 0; i < (vec.size() > size__ ? size__ : vec.size()); ++i)
+        size_t i = 0;
+        for (; i < (vec.size() > size__ ? size__ : vec.size()); ++i)
             std::swap(data__[i], vec.data__[i]);
+        
+        size_t count_minus = 0;
+        if (i < vec.size()) {
+            while (i < vec.size()) {
+                (*this).push_back(vec[i]);
+                ++i;
+                ++count_minus;
+            }
+            vec.size__ -= count_minus;
+        }
+        else {
+            while (i < size__) {
+                vec.push_back(data__[i]);
+                ++i;
+                ++count_minus;
+            }
+            size__ -= count_minus;
+        }
     }
 }
 template <class T>
