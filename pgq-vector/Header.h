@@ -1,5 +1,5 @@
 // Copyright 2022 Dmitriy <dimapermyakov55@gmail.com>
-#pragma once
+
 #ifndef DIMA_VECTOR_HEADER_HPP
 #define DIMA_VECTOR_HEADER_HPP
 #include <exception>
@@ -20,10 +20,10 @@ public:
     public:
         Iterator() : pointer_(nullptr) {}
         explicit Iterator(ValueType* ptr) : pointer_(ptr) {}
-        /*Iterator<ValueType>& operator+(const int& n) {
+        Iterator<ValueType>& operator+(const int& n) {
             pointer_ += n;
             return *this;
-        }*/
+        }
         Iterator<ValueType>& operator-(const int& n) {
             pointer_ -= n;
             return *this;
@@ -89,11 +89,11 @@ public:
     T operator[](const size_t& index) const;
     T at(const size_t& index) const;
     T& at(const size_t& index);
-    T* front() const noexcept;
-    T* back() const noexcept;
+    T& front() const noexcept;
+    T& back() const noexcept;
     T* data() const noexcept;
-    iterator begin() { return iterator(front()); }
-    iterator end() { return iterator(back()); }
+    Iterator<T> begin() { return Iterator<T>(&front()); }
+    Iterator<T> end() { return Iterator<T>(&back() + 1); }
     [[nodiscard]] bool empty() const noexcept;
     [[nodiscard]] size_t size() const noexcept;
     void reserve();
@@ -166,12 +166,12 @@ inline T& vector<T>::at(const size_t& index) {
     return data__[index];
 }
 template <class T>
-inline T* vector<T>::front() const noexcept {
-    return data__;
+inline T& vector<T>::front() const noexcept {
+    return *data__;
 }
 template <class T>
-inline T* vector<T>::back() const noexcept {
-    return (data__ + size__);
+inline T& vector<T>::back() const noexcept {
+    return *(data__ + size__ - 1);
 }
 template <class T>
 inline T* vector<T>::data() const noexcept {
@@ -203,7 +203,7 @@ inline void vector<T>::swap(vector<T>& vec) noexcept {
         size_t i = 0;
         for (; i < (vec.size() > size__ ? size__ : vec.size()); ++i)
             std::swap(data__[i], vec.data__[i]);
-        
+
         size_t count_minus = 0;
         if (i < vec.size()) {
             while (i < vec.size()) {
