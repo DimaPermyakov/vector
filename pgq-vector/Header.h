@@ -1,6 +1,7 @@
 // Copyright 2022 Dmitriy <dimapermyakov55@gmail.com>
 
-#pragma once
+#ifndef DIMA_VECTOR_HEADER_HPP
+#define DIMA_VECTOR_HEADER_HPP
 #include <exception>
 #include <iostream>
 #include <stdexcept>
@@ -17,24 +18,67 @@ public:
     class Iterator
         : public std::iterator<std::random_access_iterator_tag, ValueType> {
     public:
-        Iterator() : pointer__(nullptr) {}
-        explicit Iterator(ValueType* ptr) : pointer__(ptr) {}
-        ValueType& operator+(const int& n) { return *(pointer__ + n); }
-        ValueType& operator-(const int& n) { return *(pointer__ - n); }
-
-        ValueType& operator++(int) { return *pointer__++; }
-        ValueType& operator--(int) { return *pointer__--; }
-        ValueType& operator++() { return *(++pointer__); }
-        ValueType& operator--() { return *(--pointer__); }
-
-        bool operator!=(const Iterator& it) { return pointer__ != it.pointer__; }
-        bool operator==(const Iterator& it) { return pointer__ == it.pointer__; }
-        ValueType& operator->() { return *pointer__; }
-        ValueType& operator*() { return *pointer__; }
+        Iterator() : pointer_(nullptr) {}
+        explicit Iterator(ValueType* ptr) : pointer_(ptr) {}
+        Iterator<ValueType>& operator+(const int& n) {
+            pointer_ += n;
+            return *this;
+        }
+        Iterator<ValueType>& operator-(const int& n) {
+            pointer_ -= n;
+            return *this;
+        }
+        size_t operator-(const Iterator<ValueType>& iter) {
+            return pointer_ - iter.pointer_;
+        }
+        Iterator<ValueType>& operator+=(const ValueType& num) {
+            *this = *this + num;
+            return *this;
+        }
+        size_t operator-=(const Iterator<ValueType>& iter) {
+            *this = *this - iter;
+            return *this;
+        }
+        Iterator<ValueType>& operator++(int) {
+            pointer_++;
+            return *this;
+        }
+        Iterator<ValueType>& operator--(int) {
+            pointer_--;
+            return *this;
+        }
+        Iterator<ValueType>& operator++() {
+            ++pointer_;
+            return *this;
+        }
+        Iterator<ValueType>& operator--() {
+            --pointer_;
+            return *this;
+        }
+        Iterator<ValueType>& operator=(const Iterator<ValueType> it) {
+            if (this != &it) {
+                pointer_ = it.pointer_;
+            }
+            return *this;
+        }
+        bool operator!=(const Iterator<ValueType>& it) {
+            return pointer_ != it.pointer_;
+        }
+        bool operator==(const Iterator<ValueType>& it) {
+            return pointer_ == it.pointer_;
+        }
+        bool operator>(const Iterator<ValueType>& it) {
+            return pointer_ > it.pointer_;
+        }
+        bool operator<(const Iterator<ValueType>& it) {
+            return pointer_ < it.pointer_;
+        }
+        ValueType& operator->() { return *pointer_; }
+        ValueType& operator*() { return *pointer_; }
         friend class vector;
 
     private:
-        ValueType* pointer__;
+        ValueType* pointer_;
     };
     using iterator = Iterator<T>;
 
@@ -48,16 +92,8 @@ public:
     T* front() const noexcept;
     T* back() const noexcept;
     T* data() const noexcept;
-    iterator begin() {
-        iterator it;
-        it.pointer__ = data__;
-        return it;
-    }
-    iterator end() {
-        iterator it;
-        it.pointer__ = &data__[size__];
-        return it;
-    }
+    iterator begin() { return iterator(front()); }
+    iterator end() { return iterator(back()); }
     [[nodiscard]] bool empty() const noexcept;
     [[nodiscard]] size_t size() const noexcept;
     void reserve();
@@ -135,7 +171,7 @@ inline T* vector<T>::front() const noexcept {
 }
 template <class T>
 inline T* vector<T>::back() const noexcept {
-    return (data__ + size__ - 1);
+    return (data__ + size__);
 }
 template <class T>
 inline T* vector<T>::data() const noexcept {
@@ -204,3 +240,5 @@ inline void vector<T>::push_back(const T& val) {
     ++size__;
     data__[size__ - 1] = val;
 }
+
+#endif  // DIMA_VECTOR_HEADER_HPP
