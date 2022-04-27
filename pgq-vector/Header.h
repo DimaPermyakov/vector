@@ -1,10 +1,12 @@
 // Copyright 2022 Dmitriy <dimapermyakov55@gmail.com>
 
-#ifndef DIMA_VECTOR_HEADER_HPP
-#define DIMA_VECTOR_HEADER_HPP
+#ifndef INCLUDE_VECTOR_HEADER_HPP_
+#define INCLUDE_VECTOR_HEADER_HPP_
 #include <exception>
 #include <iostream>
 #include <stdexcept>
+#include <utility>
+#include <vector>
 
 template <class T>
 class vector {
@@ -92,11 +94,11 @@ public:
     T& front() const noexcept;
     T& back() const noexcept;
     T* data() const noexcept;
-    Iterator<T> begin() { return Iterator<T>(&front()); }
-    Iterator<T> end() { return Iterator<T>(&back() + 1); }
+    iterator begin() { return iterator(&front()); }
+    iterator end() { return iterator(&back() + 1); }
     [[nodiscard]] bool empty() const noexcept;
     [[nodiscard]] size_t size() const noexcept;
-    void reserve();
+    void reserve(const size_t& size);
     size_t capacity();
     void clear() noexcept;
     void insert(const size_t& index, const T& value);
@@ -110,9 +112,9 @@ private:
     size_t capacity__;
 };
 template <class T>
-vector<T>::vector() : size__(0), capacity__(5) {
-    data__ = new T[capacity__];
-    for (size_t i = 0; i < capacity__; ++i) data__[i] = 0;
+vector<T>::vector() : size__(0), capacity__(0) {
+    data__ = new T[1];
+    data__[0] = 0;
 }
 template <class T>
 vector<T>::vector(const size_t& size) : size__(size), capacity__(size) {
@@ -191,9 +193,8 @@ size_t vector<T>::size() const noexcept {
 }
 template <class T>
 void vector<T>::clear() noexcept {
-    delete[] data__;
-    data__ = new T[1];
-    data__[0] = 0;
+    //delete[] data__;
+    data__ = nullptr;
     size__ = 0;
     capacity__ = 0;
 }
@@ -228,16 +229,13 @@ inline void vector<T>::insert(const size_t& index, const T& value) {
     (*this).at(index) = value;
 }
 template <class T>
-void vector<T>::reserve() {
-    if (size__ <= 1) {
-        capacity__ = static_cast<size_t>(size__ * 2);
-    }
-    else {
-        capacity__ = static_cast<size_t>(size__ * 1.5);
-    }
+void vector<T>::reserve(const size_t& size) {
+    capacity__ += size;
     T* temp_data = new T[size__];
+    // coping the data to new array
     for (size_t i = 0; i < size__; ++i) temp_data[i] = data__[i];
     data__ = new T[capacity__];
+    // returning the data
     for (size_t i = 0; i < size__; ++i) data__[i] = temp_data[i];
     delete[] temp_data;
 }
@@ -248,16 +246,19 @@ void vector<T>::pop_back() {
     }
     --size__;
     if (size__ < (capacity__ / 2) && capacity__ / 1.5 > 5) {
-        reserve();
+        reserve(capacity__ * 1.5);
     }
 }
 template <class T>
 inline void vector<T>::push_back(const T& val) {
-    if (size__ >= capacity__) {
-        reserve();
+    if (capacity__ == 0) {
+        reserve(2);
+    }
+    else if (size__ >= capacity__) {
+        reserve(capacity__ * 1.5);
     }
     ++size__;
     data__[size__ - 1] = val;
 }
 
-#endif  // DIMA_VECTOR_HEADER_HPP
+#endif  // INCLUDE_VECTOR_HEADER_HPP_
