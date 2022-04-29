@@ -37,8 +37,12 @@ public:
             *this = *this + num;
             return *this;
         }
-        size_t operator-=(const Iterator<ValueType>& iter) {
+        size_t& operator-=(const Iterator<ValueType>& iter) {
             *this = *this - iter;
+            return *this;
+        }
+        Iterator<ValueType>& operator-=(const ValueType& num) {
+            *this = *this - num;
             return *this;
         }
         Iterator<ValueType>& operator++(int) {
@@ -87,6 +91,7 @@ public:
     vector<T>& operator=(const vector<T>& vec);
     template <class T1>
     friend std::ostream& operator<<(std::ostream& out, const vector<T1>& vec);
+    iterator operator+=(const iterator& it) {}
     T& operator[](const size_t& index);
     T operator[](const size_t& index) const;
     T at(const size_t& index) const;
@@ -136,6 +141,7 @@ vector<T>::~vector() {
 template <class T>
 vector<T>& vector<T>::operator=(const vector<T>& vec) {
     if (&vec != this) {
+        delete[] this;
         size__ = vec.size__;
         data__ = new T[size__];
         for (size_t i = 0; i < size__; ++i) {
@@ -193,7 +199,7 @@ size_t vector<T>::size() const noexcept {
 }
 template <class T>
 void vector<T>::clear() noexcept {
-    //delete[] data__;
+    delete[] data__;
     data__ = nullptr;
     size__ = 0;
     capacity__ = 0;
@@ -234,6 +240,7 @@ void vector<T>::reserve(const size_t& size) {
     T* temp_data = new T[size__];
     // coping the data to new array
     for (size_t i = 0; i < size__; ++i) temp_data[i] = data__[i];
+    delete[] data__;
     data__ = new T[capacity__];
     // returning the data
     for (size_t i = 0; i < size__; ++i) data__[i] = temp_data[i];
