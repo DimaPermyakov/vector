@@ -45,6 +45,7 @@ public:
             *this = *this - num;
             return *this;
         }
+
         Iterator<ValueType>& operator++(int) {
             pointer_++;
             return *this;
